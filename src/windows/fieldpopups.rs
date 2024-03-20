@@ -140,10 +140,10 @@ fn add_choice(id: String, content: &str) {
         .unwrap();
     let value = to_edit.value();
     let trimmed = value.trim();
-    let written = if trimmed.chars().last().unwrap().is_ascii_alphabetic() {
-        format!("{trimmed} {}", content)
+    let written = if trimmed.is_empty() {
+        content.to_owned()
     } else {
-        format!("{trimmed}; {}", content)
+        format!("{trimmed}, {}", content)
     };
     to_edit.set_value(&written)
 }
@@ -152,9 +152,9 @@ fn field_choice(choice: Selection, id: String) -> yew::Html {
     let email = choice.email.to_owned();
     let name = choice.name.to_owned();
     yew::html!(
-        <button class="choice" onclick={yew::Callback::from(move |_| add_choice(id.clone(), &email))}>
+        <a class="choice" href="#" onclick={yew::Callback::from(move |_| add_choice(id.clone(), &email))}>
             {name}
-        </button>
+        </a>
     )
 }
 
@@ -205,7 +205,7 @@ pub fn windows() -> yew::Html {
     let from_drop_selection = vec![
         Selection {
             name: "Bob",
-            email: "john.doe@gmail.com",
+            email: "bob.bob@tp.fr",
         },
         Selection {
             name: "Joe",

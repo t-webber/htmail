@@ -91,3 +91,20 @@
     background: var(--background);
     color: var(--color);
 }
+
+
+.popup-wrapper .field-selection {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.popup-wrapper .field-selection .choice {
+    text-align: center;
+    padding: 10px;
+    transition: 0.5s;
+}
+
+.popup-wrapper .field-selection .choice:hover {
+    background: var(--background);
+}

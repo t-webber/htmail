@@ -1,6 +1,7 @@
 .body-container {
     display: flex;
     border-bottom: 1px solid;
+    width: 100%;
 }
 
 .body-container>* {
