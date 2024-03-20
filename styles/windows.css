@@ -1,0 +1,93 @@
+.popup-wrapper {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.7);
+    transition: opacity 500ms;
+    visibility: hidden;
+    opacity: 0;
+}
+
+.popup-wrapper:target {
+    visibility: visible;
+    opacity: 1;
+}
+
+.popup-wrapper .popup {
+    margin: 70px auto;
+    padding: 20px;
+    background: var(--gray);
+    border-radius: 5px;
+    width: fit-content;
+    position: relative;
+    transition: all 5s ease-in-out;
+}
+
+.popup-wrapper .popup .close {
+    position: absolute;
+    top: 0px;
+    right: 5px;
+    transition: all 200ms;
+    font-size: larger;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.popup-wrapper .popup .close:hover {
+    color: var(--black);
+}
+
+.popup-wrapper .popup .content {
+    /* max-height: 30%; */
+    overflow: auto;
+}
+
+
+.popup-wrapper .field-form-title,
+.popup-wrapper .field-form input {
+    padding: 10px;
+}
+
+.popup-wrapper .field-form {
+    margin-top: 30px;
+}
+
+
+
+
+.popup-wrapper .field-form-title {
+    text-align: left;
+}
+
+
+.popup-wrapper .field-form input {
+    background: var(--background);
+    color: var(--color);
+    min-width: 40vw;
+}
+
+
+.popup-wrapper .add-forms {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.popup-wrapper .add-forms a {
+    margin-top: 20px;
+    padding: 10px;
+    background: var(--color);
+    color: var(--background);
+    cursor: pointer;
+    transition: 0.5s;
+    text-align: center;
+
+}
+
+.popup-wrapper .add-forms a:hover,
+.popup-wrapper .add-forms a:focus {
+    background: var(--background);
+    color: var(--color);
+}
