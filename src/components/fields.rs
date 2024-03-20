@@ -23,13 +23,13 @@ fn field(
             <ResponsiveTextarea id={id.to_owned()} placeholder={placeholder.to_owned()} ..ResponsiveTextareaProps::default()/>
             </div>
             <div class="input-menus">
-            if !add_dest.is_empty() {
-                <a class="add-button" href={add_dest.to_owned()}>{"+"}</a>
-            }
             if !drop_dest.is_empty() {
                 <a class="dropdown-button" href={drop_dest.to_owned()} >
-                    <div class="triangle"></div>
+                <div class="triangle"></div>
                 </a>
+            }
+            if !add_dest.is_empty() {
+                <a class="add-button" href={add_dest.to_owned()}>{"+"}</a>
             }
             </div>
         </div>

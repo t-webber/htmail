@@ -24,12 +24,13 @@ fn popup(PopupProps { id, title, content }: &PopupProps) -> yew::Html {
     )
 }
 
-struct Input<'a> {
-    title: &'a str,
-    id: &'a str,
-    _info: &'a str,
-    placeholder: &'a str,
-    intype: &'a str,
+#[derive(Clone)]
+struct Input {
+    title: String,
+    id: String,
+    _info: String,
+    placeholder: String,
+    intype: String,
 }
 
 // fn input(
@@ -55,8 +56,8 @@ struct Input<'a> {
 //         </tr>
 //     )
 // }
-use std::cell::RefCell;
-use std::rc::Rc;
+// use std::cell::RefCell;
+// use std::rc::Rc;
 
 fn input(
     Input {
@@ -66,19 +67,12 @@ fn input(
         placeholder,
         intype,
     }: Input,
-    buffer: Rc<RefCell<String>>,
 ) -> yew::Html {
-    let current = id
-        .get_element()
-        .dyn_into::<web_sys::HtmlInputElement>()
-        .unwrap();
     yew::html!(
         <tr>
             <th class="field-form-title">{title}</th>
             <th>
-            <input type={intype.to_owned()} placeholder={placeholder.to_owned()} id={id.to_owned()} oninput={yew::Callback::from(move |_| {
-                *buffer.borrow_mut() = current.value();
-            })} />
+            <input type={intype.to_owned()} placeholder={placeholder.to_owned()} id={id.to_owned()} />
             </th>
         </tr>
     )
@@ -105,28 +99,30 @@ fn input(
 // }
 
 fn add_forms(inputs: Vec<Input>) -> yew::Html {
-    let global_buffer: Vec<Rc<RefCell<String>>> = inputs
-        .iter()
-        .map(|_| Rc::new(RefCell::new(String::new())))
-        .collect();
-    let lines: Vec<yew::virtual_dom::VNode> = inputs
+    let lines = inputs
+        .clone()
         .into_iter()
-        .enumerate()
-        .map(|(idx, inpt)| {
-            let buffer = Rc::clone(&global_buffer[idx]);
-            let node = input(inpt, buffer);
-            node
-        })
-        .collect();
+        .map(|inpt| input(inpt.clone()))
+        .collect::<Vec<_>>();
+    let ids = inputs
+        .clone()
+        .into_iter()
+        .map(|input| input.id)
+        .collect::<Vec<_>>();
     yew::html!(
         <form class="add-forms">
             <table class="field-form">
                 {lines}
             </table>
-            <a href="#" onclick={move |_| {
-                    let values: Vec<String> = global_buffer.iter().map(|b| b.borrow().clone()).collect();
-                    logger::log(&logger::SUCCESS, &format!("G = {:?}", &values))
-                }
+            <a href="#" onclick={yew::Callback::from(move |_: yew::MouseEvent| {
+                    let value = ids.clone().into_iter().map(|id| {
+                            id
+                            .get_element()
+                            .dyn_into::<web_sys::HtmlInputElement>()
+                            .unwrap().value()
+                    }).collect::<Vec<_>>();
+                    logger::log(&logger::SUCCESS, &format!("G = {:?}", &value))
+            })
             }>{"Submit"}</a>
         </form>
     )
@@ -178,32 +174,32 @@ fn fields_selection(inputs: Vec<Selection>, id: &str) -> yew::Html {
 pub fn windows() -> yew::Html {
     let from_add_form = vec![
         Input {
-            id: "profilename",
-            title: "Profile name",
-            _info: "info",
-            placeholder: "john-gmail",
-            intype: "text",
+            id: "profilename".to_owned(),
+            title: "Profile name".to_owned(),
+            _info: "info".to_owned(),
+            placeholder: "john-gmail".to_owned(),
+            intype: "text".to_owned(),
         },
         Input {
-            id: "displayname",
-            title: "Display name",
-            _info: "b",
-            placeholder: "John Doe",
-            intype: "text",
+            id: "displayname".to_owned(),
+            title: "Display name".to_owned(),
+            _info: "b".to_owned(),
+            placeholder: "John Doe".to_owned(),
+            intype: "text".to_owned(),
         },
         Input {
-            id: "email",
-            title: "Email address",
-            _info: "b",
-            placeholder: "john.doe@gmail.com",
-            intype: "email",
+            id: "email".to_owned(),
+            title: "Email address".to_owned(),
+            _info: "b".to_owned(),
+            placeholder: "john.doe@gmail.com".to_owned(),
+            intype: "email".to_owned(),
         },
         Input {
-            id: "pasword",
-            title: "SMTP password",
-            _info: "b",
-            placeholder: "abcd efgh ikjl mnop",
-            intype: "password",
+            id: "pasword".to_owned(),
+            title: "SMTP password".to_owned(),
+            _info: "b".to_owned(),
+            placeholder: "abcd efgh ikjl mnop".to_owned(),
+            intype: "password".to_owned(),
         },
     ];
     let from_drop_selection = vec![
@@ -218,18 +214,18 @@ pub fn windows() -> yew::Html {
     ];
     let to_add_form = vec![
         Input {
-            id: "recipient_name",
-            title: "Name",
-            _info: "info",
-            placeholder: "john-gmail",
-            intype: "text",
+            id: "recipient_name".to_owned(),
+            title: "Name".to_owned(),
+            _info: "info".to_owned(),
+            placeholder: "john-gmail".to_owned(),
+            intype: "text".to_owned(),
         },
         Input {
-            id: "email",
-            title: "Email",
-            _info: "b",
-            placeholder: "john.doe@gmail.com",
-            intype: "email",
+            id: "email".to_owned(),
+            title: "Email".to_owned(),
+            _info: "b".to_owned(),
+            placeholder: "john.doe@gmail.com".to_owned(),
+            intype: "email".to_owned(),
         },
     ];
     let to_drop_selection = vec![
