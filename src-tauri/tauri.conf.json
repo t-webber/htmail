@@ -1,7 +1,7 @@
 {
   "productName": "htmail",
   "version": "0.0.0",
-  "identifier": "com.tauri.dev",
+  "identifier": "com.htmail.dev",
   "build": {
     "beforeDevCommand": "trunk serve",
     "devUrl": "http://localhost:1420",
@@ -15,7 +15,8 @@
         "title": "htmail",
         "width": 720,
         "height": 1080,
-        "alwaysOnTop": true
+        "alwaysOnTop": true,
+        "resizable": true
       }
     ],
     "security": {

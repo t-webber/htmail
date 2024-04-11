@@ -1,0 +1,26 @@
+.footer-component {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.footer-component .send {
+  padding: 8px;
+  width: 80px;
+  font-size: large;
+  background-color: var(--color);
+  border-left: 1px solid var(--color);
+  transition: 0.5s;
+}
+
+.footer-component .left-empty {
+  width: 80px;
+}
+
+.footer-component .send:hover,
+.footer-component .send:focus {
+  background-color: var(--gray);
+  color: white;
+  cursor: pointer;
+}

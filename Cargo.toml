@@ -9,11 +9,19 @@ exclude = [".tests"]
 yew = { version = "0.21", features = ["csr"] }
 wasm-bindgen = "0.2"
 wasm-bindgen-futures = "0.4"
-web-sys = "0.3"
+web-sys = { version = "0.3", features = ["HtmlDivElement"]}
 js-sys = "0.3"
 serde = { version = "1", features = ["derive"] }
 serde-wasm-bindgen = "0.6"
+serde_json = "1"
 chrono = "0.4"
+yew_icons = {version = "0.8", features = [ "FeatherEdit3", "LucideView", "LucideX"]}
 
 [workspace]
 members = [ "src-tauri"]
+
+[package.metadata.scripts]
+run = "cargo tauri dev"
+check = "cargo tauri build"
+build = "cargo tauri android dev"
+release = "cargo tauri android build"

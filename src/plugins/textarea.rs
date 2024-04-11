@@ -1,34 +1,16 @@
-use crate::tools::html::GetElement;
+use crate::tools::html::{self, GetElement};
 use crate::windows::logger;
 use wasm_bindgen::JsCast;
 
-pub fn update_height(id: String) {
-    let textarea = id.get_element().dyn_into::<web_sys::HtmlElement>().unwrap();
+#[allow(clippy::expect_used)]
+fn update_height(id: &str) {
+    let textarea = id.get_element_cast::<web_sys::HtmlElement>();
 
-    if textarea
+    let window = html::get_window();
+    let textarea_elt = textarea
         .clone()
-        .dyn_into::<web_sys::HtmlTextAreaElement>()
-        .unwrap()
-        .value()
-        .is_empty()
-    {
-        match textarea.set_attribute("style", "height: 100%;") {
-            Ok(()) => (),
-            Err(err) => {
-                logger::log(
-                    &logger::WARNING,
-                    &format!("Error on scrolling textarea: {err:?}"),
-                );
-            }
-        }
-        return;
-    }
-
-    // let scroll_height = textarea.scroll_height();
-    // let client_height = textarea.client_height();
-
-    let window = web_sys::window().expect("no global `window` exists");
-    let html_element = textarea.clone().dyn_into::<web_sys::Element>().unwrap();
+        .dyn_into::<web_sys::Element>()
+        .expect("Could not cast textarea into element");
     let js_value = js_sys::Reflect::get(
         &window,
         &wasm_bindgen::JsValue::from_str("getComputedStyle"),
@@ -39,11 +21,11 @@ pub fn update_height(id: String) {
     let styles = js_sys::Reflect::apply(
         &get_computed_style,
         &window,
-        &js_sys::Array::of1(&html_element.into()),
+        &js_sys::Array::of1(&textarea_elt.into()),
     )
     .unwrap();
 
-    let font_size: f32 =
+    let font_size: f64 =
         js_sys::Reflect::get(&styles, &wasm_bindgen::JsValue::from_str("fontSize"))
             .unwrap()
             .as_string()
@@ -65,11 +47,15 @@ pub fn update_height(id: String) {
             }
         }
 
-        let scroll_height = html_element.scroll_height() as f32;
+        let scroll_height = f64::from(html_element.scroll_height());
 
-        match html_element
-            .set_attribute("style", &format!("height: {}px", scroll_height + font_size))
-        {
+        match html_element.set_attribute(
+            "style",
+            &format!(
+                "height: {}px",
+                scroll_height + font_size // .unwrap_or(scroll_height)
+            ),
+        ) {
             Ok(()) => (),
             Err(err) => {
                 logger::log(
@@ -81,30 +67,67 @@ pub fn update_height(id: String) {
     };
 }
 
-#[derive(yew::Properties, PartialEq, Default)]
+#[derive(Default, PartialEq, yew::Properties)]
 pub struct ResponsiveTextareaProps {
     pub name: String,
     pub id: String,
+    pub value: String,
     pub placeholder: String,
     pub oninput: Option<yew::Callback<yew::InputEvent>>,
+    pub onkeydown: Option<yew::Callback<yew::KeyboardEvent>>,
 }
 
 #[yew::function_component(ResponsiveTextarea)]
 pub fn textarea(props: &ResponsiveTextareaProps) -> yew::Html {
-    let name = props.name.clone();
-    let id = props.id.clone();
+    let ResponsiveTextareaProps {
+        name,
+        id,
+        value,
+        placeholder,
+        oninput,
+        onkeydown,
+    } = props;
     let idclone = props.id.clone();
-    let other_placeholder = props.placeholder.clone();
-    let cloned = props
-        .oninput
+    let idclone2 = props.id.clone();
+    let oninputcloned = oninput
         .clone()
-        .unwrap_or(yew::Callback::from(|_: yew::InputEvent| ()));
-    let oninput = yew::Callback::from(move |event: yew::InputEvent| {
-        cloned.emit(event.clone());
-        update_height(idclone.clone());
+        .unwrap_or_else(|| yew::Callback::from(|_: yew::InputEvent| ()));
+    let onkeydowncloned = onkeydown
+        .clone()
+        .unwrap_or_else(|| yew::Callback::from(|_: yew::KeyboardEvent| ()));
+    let on_input_callback = yew::Callback::from(move |event: yew::InputEvent| {
+        oninputcloned.emit(event);
+        update_height(&idclone.clone());
     });
+    let on_key_down_callback = yew::Callback::from(move |event: yew::KeyboardEvent| {
+        onkeydowncloned.emit(event);
+        update_height(&idclone2.clone());
+    });
+    let readonly = id == "from-field";
     yew::html!(
-        <textarea name={name.clone()} id={id.clone()} placeholder={other_placeholder.clone()}
-        oninput={oninput} />
+        <textarea name={name.clone()} id={id.clone()} value={value.clone()} placeholder={placeholder.clone()}
+        oninput={on_input_callback} onkeydown={on_key_down_callback} readonly={readonly}/>
+    )
+}
+#[yew::function_component(Input)]
+pub fn input(props: &ResponsiveTextareaProps) -> yew::Html {
+    let ResponsiveTextareaProps {
+        name,
+        id,
+        placeholder,
+        oninput,
+        onkeydown,
+        ..
+    } = props;
+    let oninputcloned = oninput
+        .clone()
+        .unwrap_or_else(|| yew::Callback::from(|_: yew::InputEvent| ()));
+    let onkeydowncloned = onkeydown
+        .clone()
+        .unwrap_or_else(|| yew::Callback::from(|_: yew::KeyboardEvent| ()));
+    let readonly = id == "from-field";
+    yew::html!(
+        <input name={name.clone()} id={id.clone()} placeholder={placeholder.clone()}
+        oninput={oninputcloned} onkeydown={onkeydowncloned} readonly={readonly}/>
     )
 }

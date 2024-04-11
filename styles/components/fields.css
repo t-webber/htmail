@@ -1,0 +1,91 @@
+.fields-container .field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 0.5px solid;
+}
+
+.fields-container .input-menus {
+  display: flex;
+  align-items: center;
+}
+
+#subject-field {
+  width: calc(95% - 5px);
+}
+
+.fields-container .input-menus > * {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  height: calc(var(--font-size) * 2);
+  width: calc(var(--font-size) * 2);
+
+  cursor: pointer;
+}
+
+.fields-container .input-menus > *:hover {
+  transition: 0.5s;
+  background: var(--black);
+}
+
+.fields-container .input-menus > *:focus {
+  outline: none;
+  background: var(--color);
+  color: var(--background);
+}
+
+.fields-container .input-menus > *:active {
+  transition: 0s;
+  background: var(--black);
+}
+
+.fields-container .triangle {
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+
+  border-top: 8px solid;
+}
+
+.fields-container .input-wrapper {
+  width: 100%;
+}
+
+.fields-container .input-wrapper > * {
+  padding-left: 10px;
+  height: calc(var(--font-size) * 2);
+  line-height: calc(var(--font-size) * 2);
+  background: transparent;
+  width: 100%;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  color: var(--color);
+  resize: none;
+}
+
+.fields-container .add-button {
+  font-weight: 700;
+}
+
+.field-selection {
+  display: flex;
+  flex-direction: column;
+  padding-top: 20px;
+}
+
+.field-selection button {
+  padding: 10px 5px;
+  background: transparent;
+  color: inherit;
+  border-radius: 5px;
+  transition: 1s;
+  cursor: pointer;
+}
+
+.field-selection button:hover {
+  background: var(--black);
+}

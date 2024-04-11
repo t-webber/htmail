@@ -2,43 +2,50 @@ use crate::tools::html::GetElement;
 use chrono::Timelike;
 
 #[allow(dead_code)]
+#[derive(PartialEq, Eq)]
 pub enum LoggingSpecies {
     Warning,
     Failure,
     Success,
+    Debug,
 }
 
-trait ToID {
-    fn to_id(self) -> String;
-}
-
-impl ToID for &LoggingSpecies {
-    fn to_id(self) -> String {
-        match self {
-            LoggingSpecies::Warning => "logger-warning".to_owned(),
-            LoggingSpecies::Failure => "logger-failure".to_owned(),
-            LoggingSpecies::Success => "logger-success".to_owned(),
+impl LoggingSpecies {
+    fn to_id(&self) -> String {
+        match *self {
+            Self::Warning => "logger-warning".to_owned(),
+            Self::Failure => "logger-failure".to_owned(),
+            Self::Success => "logger-success".to_owned(),
+            Self::Debug => "logger-success".to_owned(),
         }
     }
 }
 
 #[allow(dead_code)]
 pub const SUCCESS: LoggingSpecies = LoggingSpecies::Success;
+#[allow(dead_code)]
 pub const WARNING: LoggingSpecies = LoggingSpecies::Warning;
+#[allow(dead_code)]
 pub const FAILURE: LoggingSpecies = LoggingSpecies::Failure;
+#[allow(dead_code)]
+pub const DEBUG: LoggingSpecies = LoggingSpecies::Debug;
 
 pub fn log(species: &LoggingSpecies, message: &str) {
     let local_time = chrono::Local::now();
-    let time_string = format!(
-        "{}:{}:{}",
-        local_time.hour(),
-        local_time.minute(),
-        local_time.second()
-    );
+    let time_string = if *species == DEBUG {
+        format!(
+            "[{}:{}:{}]&nbsp;",
+            local_time.hour(),
+            local_time.minute(),
+            local_time.second()
+        )
+    } else {
+        String::new()
+    };
 
     let elt = "logger".get_element();
     elt.set_inner_html(&format!(
-        "{}<div class=\"{}\">&nbsp;[{}]&nbsp;{}.</div>",
+        "{}<div class=\"{}\">&nbsp;{}{}.</div>",
         elt.inner_html(),
         species.to_id(),
         time_string,
