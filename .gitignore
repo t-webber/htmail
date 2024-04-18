@@ -4,5 +4,6 @@ target
 *.lock
 gen
 build
-docs
 db/
+*.ps1
+*.local*
