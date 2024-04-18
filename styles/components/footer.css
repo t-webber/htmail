@@ -11,6 +11,7 @@
   font-size: large;
   background-color: var(--color);
   border-left: 1px solid var(--color);
+  color: var(--background);
   transition: 0.5s;
 }
 

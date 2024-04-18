@@ -6,24 +6,19 @@ pub struct ActionBtn {
 }
 
 #[derive(PartialEq, yew::Properties, Clone)]
-pub struct ActionsProps {
+pub struct ActionListProps {
     pub actions: Vec<ActionBtn>,
 }
 
 #[yew::function_component]
-pub fn Actions(props: &ActionsProps) -> yew::Html {
+pub fn ActionList(props: &ActionListProps) -> yew::Html {
     let cloned = (*props).clone();
     yew::html! {
         <div class="actions">
             {cloned.actions.into_iter().filter_map(move |ActionBtn {content, action, condition}: ActionBtn| {
-                if !condition {
-                    None
-                } else {
-                    Some(yew::html!(
+                condition.then(|| yew::html!(
                         <button onclick={move |_| action.emit(())}>{content}</button>
-                    ))
-                }
-            }).collect::<Vec<_>>()}
+                    ))}).collect::<Vec<_>>()}
         </div>
     }
 }

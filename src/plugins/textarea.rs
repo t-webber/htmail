@@ -49,6 +49,7 @@ fn update_height(id: &str) {
 
         let scroll_height = f64::from(html_element.scroll_height());
 
+        #[allow(clippy::float_arithmetic)]
         match html_element.set_attribute(
             "style",
             &format!(

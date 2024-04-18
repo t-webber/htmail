@@ -162,17 +162,18 @@ pub async fn add_recipient(values: &[String]) -> bool {
     true
 }
 
-pub async fn get_profiles() -> fieldpopups::SelectionVec {
+pub async fn get_profiles() -> Result<fieldpopups::SelectionVec, String> {
     let invoke_result = invoke("get_profiles", wasm_bindgen::JsValue::NULL).await;
-    // web_sys::console::log_1(&invoke_result);
     let stringified = invoke_result.as_string().unwrap_or_default();
-    let result: Vec<fieldpopups::Selection> = serde_json::from_str(&stringified).unwrap();
-    fieldpopups::SelectionVec::from(result)
+    let result: Vec<fieldpopups::Selection> =
+        serde_json::from_str(&stringified).map_err(|err| err.to_string())?;
+    Ok(fieldpopups::SelectionVec::from(result))
 }
-pub async fn get_recipients() -> fieldpopups::SelectionVec {
+
+pub async fn get_recipients() -> Result<fieldpopups::SelectionVec, String> {
     let invoke_result = invoke("get_recipients", wasm_bindgen::JsValue::NULL).await;
-    // web_sys::console::log_1(&invoke_result);
     let stringified = invoke_result.as_string().unwrap_or_default();
-    let result: Vec<fieldpopups::Selection> = serde_json::from_str(&stringified).unwrap();
-    fieldpopups::SelectionVec::from(result)
+    let result: Vec<fieldpopups::Selection> =
+        serde_json::from_str(&stringified).map_err(|err| err.to_string())?;
+    Ok(fieldpopups::SelectionVec::from(result))
 }

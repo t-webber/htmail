@@ -6,7 +6,6 @@
     clippy::cargo
 )]
 #![allow(clippy::missing_docs_in_private_items)]
-#![allow(clippy::cargo_common_metadata)]
 #![allow(clippy::blanket_clippy_restriction_lints)]
 #![allow(clippy::implicit_return)]
 #![allow(clippy::single_call_fn)]

@@ -38,7 +38,7 @@ impl yew::Component for Field {
         yew::html! {
            <div class="field">
             <div class="input-wrapper">
-            <textarea::Input id={ctx.props().id.to_owned()} placeholder={ctx.props().placeholder.to_owned()} ..textarea::ResponsiveTextareaProps::default() />
+            <textarea::Input id={ctx.props().id.clone()} placeholder={ctx.props().placeholder.clone()} ..textarea::ResponsiveTextareaProps::default() />
             </div>
             <div class="input-menus">
             if !ctx.props().drop_dest.is_empty() {
@@ -62,22 +62,22 @@ impl yew::Component for Field {
     }
 }
 
-pub struct Fields;
+pub struct FieldSet;
 
 #[derive(Clone, yew::Properties)]
-pub struct FieldsProps {
+pub struct FieldSetProps {
     pub msg_parent: yew::Callback<fieldpopups::SelectionSpecies>,
 }
 
-impl PartialEq for FieldsProps {
+impl PartialEq for FieldSetProps {
     fn eq(&self, _: &Self) -> bool {
         true
     }
 }
 
-impl yew::Component for Fields {
+impl yew::Component for FieldSet {
     type Message = ();
-    type Properties = FieldsProps;
+    type Properties = FieldSetProps;
 
     fn create(_ctx: &yew::Context<Self>) -> Self {
         Self {}

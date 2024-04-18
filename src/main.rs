@@ -10,17 +10,19 @@
 #![allow(clippy::implicit_return)]
 #![allow(clippy::single_call_fn)]
 #![allow(clippy::question_mark_used)]
-#![allow(clippy::float_arithmetic)]
 // BAD
 #![allow(clippy::missing_docs_in_private_items)]
-#![allow(clippy::cargo_common_metadata)]
 #![allow(clippy::multiple_crate_versions)]
 #![allow(clippy::impl_trait_in_params)]
+#![allow(clippy::pattern_type_mismatch)]
+#![allow(clippy::unwrap_used)]
+#![allow(clippy::as_conversions)]
+#![allow(clippy::field_reassign_with_default)]
 // IDIOMATIC
 #![allow(clippy::absolute_paths)]
-#![allow(clippy::field_reassign_with_default)]
 #![allow(clippy::mod_module_files)]
 #![allow(clippy::needless_for_each)]
+#![allow(clippy::missing_trait_methods)]
 
 mod components;
 mod plugins;
@@ -28,13 +30,12 @@ mod tools;
 mod windows;
 
 use components::body;
-use components::fields::Fields;
+use components::fields;
 use components::footer::Footer;
 use components::titlebar::Titlebar;
 use tools::fetch;
 use windows::{fieldpopups, logger};
 
-///[App]
 struct App {
     from_drop_selection: fieldpopups::SelectionVec,
     to_drop_selection: fieldpopups::SelectionVec,
@@ -66,10 +67,10 @@ impl yew::Component for App {
                 <div class="app-container">
                     <div class="vbar">
                         <Titlebar />
-                        <Fields msg_parent={ctx.link().callback(|content| AppMsg::Update(content))} />
+                        <fields::FieldSet msg_parent={ctx.link().callback(AppMsg::Update)} />
                     </div>
                     <div class="grow">
-                        <body::Body ..body::BodyProps::default() />
+                        <body::Container  ..body::ContainerProps::default() />
                     </div>
                     <div class="vbar">
                         <Footer />
@@ -81,6 +82,7 @@ impl yew::Component for App {
     }
 
     fn update(&mut self, ctx: &yew::prelude::Context<Self>, msg: Self::Message) -> bool {
+        #[allow(clippy::expect_used)]
         match msg {
             AppMsg::Update(species) => match species {
                 fieldpopups::SelectionSpecies::None => return false,
@@ -89,7 +91,7 @@ impl yew::Component for App {
                         let profiles = fetch::get_profiles().await;
                         AppMsg::UpdateComplete(AppUpdateComplete {
                             species: species.clone(),
-                            vec: profiles,
+                            vec: profiles.expect("Failed to fetch profiles"),
                         })
                     });
                 }
@@ -98,7 +100,7 @@ impl yew::Component for App {
                         let profiles = fetch::get_recipients().await;
                         AppMsg::UpdateComplete(AppUpdateComplete {
                             species: species.clone(),
-                            vec: profiles,
+                            vec: profiles.expect("Failed to fetch recipients"),
                         })
                     });
                 }
@@ -107,7 +109,7 @@ impl yew::Component for App {
                 fieldpopups::SelectionSpecies::Profile => self.from_drop_selection = vec,
 
                 fieldpopups::SelectionSpecies::Recipient => {
-                    self.to_drop_selection = std::mem::take(&mut vec);
+                    self.to_drop_selection = core::mem::take(&mut vec);
                 }
                 fieldpopups::SelectionSpecies::None => {}
             },

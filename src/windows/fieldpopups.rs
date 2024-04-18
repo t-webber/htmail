@@ -3,19 +3,18 @@ use crate::tools::html::GetElement;
 
 use super::logger;
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Eq)]
 pub enum PopupSpecies {
     Add,
     Select,
 }
 
 impl PopupSpecies {
-    fn to_id(&self) -> String {
+    const fn to_id(&self) -> &'static str {
         match self {
-            PopupSpecies::Add => "add",
-            PopupSpecies::Select => "select",
+            Self::Add => "add",
+            Self::Select => "select",
         }
-        .to_owned()
     }
 }
 
@@ -128,12 +127,14 @@ pub struct Selection {
     pub email: String,
 }
 impl Ord for Selection {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+    fn cmp(&self, other: &Self) -> core::cmp::Ordering {
         self.email.cmp(&other.email)
     }
 }
+
+#[allow(clippy::non_canonical_partial_ord_impl)]
 impl PartialOrd for Selection {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+    fn partial_cmp(&self, other: &Self) -> Option<core::cmp::Ordering> {
         self.email.partial_cmp(&other.email)
     }
 }
@@ -151,7 +152,7 @@ impl SelectionVec {
 
 impl From<Vec<Selection>> for SelectionVec {
     fn from(vec: Vec<Selection>) -> Self {
-        let mut selection_vec = SelectionVec::default();
+        let mut selection_vec = Self::default();
         vec.into_iter()
             .for_each(|selection| selection_vec.push(selection));
         selection_vec
@@ -171,8 +172,8 @@ fn add_choice(id: &str, content: &str) {
 }
 
 fn field_choice(choice: &Selection, id: String) -> yew::Html {
-    let email = choice.email.to_owned();
-    let name = choice.name.to_owned();
+    let email = choice.email.clone();
+    let name = choice.name.clone();
     yew::html!(
         <a class="choice" href="#" onclick={yew::Callback::from(move |_| add_choice(&id, &name))}>
             {email}
@@ -186,7 +187,7 @@ fn vec2lines(inputs: &SelectionVec, species: &SelectionSpecies) -> yew::Html {
         {
         inputs
             .0.iter()
-            .map(|selecitem| field_choice(selecitem, species.to_dest()))
+            .map(|selecitem| field_choice(selecitem, species.to_dest().to_owned()))
             .collect::<yew::Html>()
     }</div>)
 }
@@ -208,8 +209,8 @@ pub enum SelectionSpecies {
 }
 
 impl SelectionSpecies {
-    pub fn to_id(&self) -> String {
-        match self {
+    pub fn to_id(&self) -> &'static str {
+        match *self {
             Self::Profile => "profile-popup-field-selection",
             Self::Recipient => "recipient-popup-field-selection",
             Self::None => {
@@ -220,11 +221,10 @@ impl SelectionSpecies {
                 ""
             }
         }
-        .to_owned()
     }
 
-    pub fn to_dest(&self) -> String {
-        match self {
+    pub fn to_dest(&self) -> &'static str {
+        match *self {
             Self::Profile => "from-field",
             Self::Recipient => "to-field",
             Self::None => {
@@ -235,11 +235,10 @@ impl SelectionSpecies {
                 ""
             }
         }
-        .to_owned()
     }
 }
 
-#[derive(PartialEq, yew::Properties)]
+#[derive(PartialEq, Eq, yew::Properties)]
 pub struct WindowsProps {
     pub to_drop_selection: SelectionVec,
     pub from_drop_selection: SelectionVec,
@@ -301,11 +300,11 @@ pub fn windows(
     yew::html!(
         <div class="windows-container">
             <Popup id={"from-add-form"} title={"Add a profile"} content={add_forms(&from_add_form, "profile")} species={PopupSpecies::Add} />
-            <Popup id={"from-drop-selection"} title={"Select a profile"} content={fields_selection(&from_drop_selection, &SelectionSpecies::Profile)}
+            <Popup id={"from-drop-selection"} title={"Select a profile"} content={fields_selection(from_drop_selection, &SelectionSpecies::Profile)}
                 species={PopupSpecies::Select} />
 
             <Popup id={"to-add-form"} title={"Add a recipient"} content={add_forms(&to_add_form, "recipient")} species={PopupSpecies::Add} />
-            <Popup id={"to-drop-selection"} title={"Select a recipient"} content={fields_selection(&to_drop_selection, &SelectionSpecies::Recipient)}
+            <Popup id={"to-drop-selection"} title={"Select a recipient"} content={fields_selection(to_drop_selection, &SelectionSpecies::Recipient)}
                 species={PopupSpecies::Select} />
         </div>
     )

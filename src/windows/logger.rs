@@ -11,23 +11,18 @@ pub enum LoggingSpecies {
 }
 
 impl LoggingSpecies {
-    fn to_id(&self) -> String {
+    const fn to_id(&self) -> &'static str {
         match *self {
-            Self::Warning => "logger-warning".to_owned(),
-            Self::Failure => "logger-failure".to_owned(),
-            Self::Success => "logger-success".to_owned(),
-            Self::Debug => "logger-success".to_owned(),
+            Self::Warning => "logger-warning",
+            Self::Failure => "logger-failure",
+            Self::Success | Self::Debug => "logger-success",
         }
     }
 }
 
-#[allow(dead_code)]
 pub const SUCCESS: LoggingSpecies = LoggingSpecies::Success;
-#[allow(dead_code)]
 pub const WARNING: LoggingSpecies = LoggingSpecies::Warning;
-#[allow(dead_code)]
 pub const FAILURE: LoggingSpecies = LoggingSpecies::Failure;
-#[allow(dead_code)]
 pub const DEBUG: LoggingSpecies = LoggingSpecies::Debug;
 
 pub fn log(species: &LoggingSpecies, message: &str) {

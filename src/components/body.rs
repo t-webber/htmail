@@ -4,16 +4,15 @@ use crate::tools::html::GetElement;
 use crate::windows::logger;
 use wasm_bindgen::JsCast;
 
-///[BodyTextArea]
-struct BodyTextArea {
+struct ContainerTextArea {
     open: bool,
     other_open: bool,
-    msg_parent: yew::Callback<BodyMsg>,
+    msg_parent: yew::Callback<ContainerMsg>,
     content: String,
 }
 
-impl From<&BodyTextAreaProps> for BodyTextArea {
-    fn from(value: &BodyTextAreaProps) -> Self {
+impl From<&ContainerTextAreaProps> for ContainerTextArea {
+    fn from(value: &ContainerTextAreaProps) -> Self {
         Self {
             open: value.open,
             other_open: value.other_open,
@@ -23,21 +22,21 @@ impl From<&BodyTextAreaProps> for BodyTextArea {
     }
 }
 
-enum BodyTextAreaMsg {}
+enum ContainerTextAreaMsg {}
 
 #[derive(Clone, PartialEq, yew::Properties)]
-struct BodyTextAreaProps {
+struct ContainerTextAreaProps {
     open: bool,
     other_open: bool,
-    msg_parent: yew::Callback<BodyMsg>,
+    msg_parent: yew::Callback<ContainerMsg>,
     content: String,
 }
 
 const EDITOR_ID: &str = "body-textarea-textarea";
 
-impl yew::Component for BodyTextArea {
-    type Message = BodyTextAreaMsg;
-    type Properties = BodyTextAreaProps;
+impl yew::Component for ContainerTextArea {
+    type Message = ContainerTextAreaMsg;
+    type Properties = ContainerTextAreaProps;
 
     fn create(ctx: &yew::Context<Self>) -> Self {
         Self::from(ctx.props())
@@ -66,25 +65,25 @@ impl yew::Component for BodyTextArea {
                             let value = textarea.value();
                             let new_value = format!("{}\t{}", &value.get(..start_usize).unwrap_or_default(), &value.get(end_usize..).unwrap_or_default());
                             textarea.set_value(&new_value);
-                            let _ = textarea.set_selection_start(Some((start_u32 + 1) as u32));
-                            let _ = textarea.set_selection_end(Some((start_u32 + 1) as u32));
-                            callback_tab.emit(BodyMsg::UpdateRender);
+                            textarea.set_selection_start(Some(start_u32.checked_add(1).unwrap_or(start_u32))).unwrap_or_else(|err| logger::log(&logger::FAILURE, &format!("Error while writing tab in body: {err:?}")));
+                            textarea.set_selection_end(Some(start_u32.checked_add(1).unwrap_or(start_u32))).unwrap_or_else(|err| logger::log(&logger::FAILURE, &format!("Error while writing tab in body: {err:?}")));
+                            callback_tab.emit(ContainerMsg::UpdateRender);
                         }}
                         oninput={Some(
                             yew::Callback::<yew::InputEvent>::from(move |_: yew::InputEvent| {
-                                callback_textarea.emit(BodyMsg::UpdateRender);
+                                callback_textarea.emit(ContainerMsg::UpdateRender);
                         }))} />
-                    <actions::Actions actions={vec![
+                    <actions::ActionList actions={vec![
                         actions::ActionBtn{
                             condition: self.other_open,
                         content: yew::html!( <yew_icons::Icon icon_id={yew_icons::IconId::LucideX} class="action-icon" />),
-                        action: yew::Callback::from(move |_| callback_one.emit(BodyMsg::CloseEditor))
+                        action: yew::Callback::from(move |()| callback_one.emit(ContainerMsg::CloseEditor))
                     },
                     actions::ActionBtn{
                         condition: !self.other_open,
                         content: yew::html!( <yew_icons::Icon icon_id={yew_icons::IconId::LucideView} class="action-icon" />),
-                        action: yew::Callback::from(move |_| {
-                            callback_two.emit(BodyMsg::OpenRender);
+                        action: yew::Callback::from(move |()| {
+                            callback_two.emit(ContainerMsg::OpenRender);
                                 })
                         }
                     ]} />
@@ -105,27 +104,26 @@ impl yew::Component for BodyTextArea {
     }
 }
 
-///[BodyRender]
 #[derive(Debug)]
-struct BodyRender {
+struct ContainerRender {
     open: bool,
     other_open: bool,
-    msg_parent: yew::Callback<BodyMsg>,
+    msg_parent: yew::Callback<ContainerMsg>,
     content: String,
 }
 
-enum BodyRenderMsg {}
+enum ContainerRenderMsg {}
 
 #[derive(Clone, PartialEq, yew::Properties)]
-struct BodyRenderProps {
+struct ContainerRenderProps {
     open: bool,
     other_open: bool,
-    msg_parent: yew::Callback<BodyMsg>,
+    msg_parent: yew::Callback<ContainerMsg>,
     content: String,
 }
 
-impl From<&BodyRenderProps> for BodyRender {
-    fn from(value: &BodyRenderProps) -> Self {
+impl From<&ContainerRenderProps> for ContainerRender {
+    fn from(value: &ContainerRenderProps) -> Self {
         Self {
             open: value.open,
             other_open: value.other_open,
@@ -135,9 +133,9 @@ impl From<&BodyRenderProps> for BodyRender {
     }
 }
 
-impl yew::Component for BodyRender {
-    type Message = BodyRenderMsg;
-    type Properties = BodyRenderProps;
+impl yew::Component for ContainerRender {
+    type Message = ContainerRenderMsg;
+    type Properties = ContainerRenderProps;
 
     fn create(ctx: &yew::Context<Self>) -> Self {
         Self::from(ctx.props())
@@ -151,19 +149,19 @@ impl yew::Component for BodyRender {
             yew::html! (
                 <div class="right" id="body-render-container" >
                 <div id="body-render" class="body-render">{self.content.clone()}</div>
-                <actions::Actions actions={vec![
+                <actions::ActionList actions={vec![
                     actions::ActionBtn{
                         condition: self.other_open,
                         content: yew::html!( <yew_icons::Icon icon_id={yew_icons::IconId::LucideX} class="action-icon" />),
-                        action: yew::Callback::from(move |_| {
-                            callback_close.emit(BodyMsg::CloseRender);
+                        action: yew::Callback::from(move |()| {
+                            callback_close.emit(ContainerMsg::CloseRender);
                     })
                 },
                     actions::ActionBtn{
                         condition: !self.other_open,
                         content: yew::html!( <yew_icons::Icon icon_id={yew_icons::IconId::FeatherEdit3} class="action-icon" />),
-                        action: yew::Callback::from(move |_| {
-                            callback_open.emit(BodyMsg::OpenEditor);
+                        action: yew::Callback::from(move |()| {
+                            callback_open.emit(ContainerMsg::OpenEditor);
                     })
                 }]} />
                     </div>
@@ -184,28 +182,28 @@ impl yew::Component for BodyRender {
 }
 
 #[derive(Debug)]
-pub struct Body {
+pub struct Container {
     render_open: bool,
     editor_open: bool,
     content: String,
 }
 
 #[allow(dead_code)]
-pub enum BodyMsg {
+pub enum ContainerMsg {
     CloseEditor,
     OpenEditor,
     CloseRender,
     OpenRender,
     UpdateRender,
 }
-#[derive(Clone, PartialEq, yew::Properties)]
-pub struct BodyProps {
+#[derive(Clone, PartialEq, Eq, yew::Properties)]
+pub struct ContainerProps {
     pub render_open: bool,
     pub editor_open: bool,
     pub content: String,
 }
 
-impl Default for BodyProps {
+impl Default for ContainerProps {
     fn default() -> Self {
         Self {
             render_open: true,
@@ -215,9 +213,9 @@ impl Default for BodyProps {
     }
 }
 
-impl yew::Component for Body {
-    type Message = BodyMsg;
-    type Properties = BodyProps;
+impl yew::Component for Container {
+    type Message = ContainerMsg;
+    type Properties = ContainerProps;
 
     fn create(ctx: &yew::Context<Self>) -> Self {
         Self {
@@ -230,24 +228,24 @@ impl yew::Component for Body {
     fn view(&self, ctx: &yew::Context<Self>) -> yew::Html {
         yew::html! {
             <div class="body-container" >
-                <BodyTextArea open={self.editor_open} msg_parent={ctx.link().callback(|msg| msg)} other_open={self.render_open} content={self.content.clone()} />
-                <BodyRender open={self.render_open} msg_parent={ctx.link().callback(|msg| msg)} content={self.content.clone()} other_open={self.editor_open} />
+                <ContainerTextArea open={self.editor_open} msg_parent={ctx.link().callback(|msg| msg)} other_open={self.render_open} content={self.content.clone()} />
+                <ContainerRender open={self.render_open} msg_parent={ctx.link().callback(|msg| msg)} content={self.content.clone()} other_open={self.editor_open} />
             </div>
         }
     }
 
     fn update(&mut self, ctx: &yew::prelude::Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            BodyMsg::CloseEditor => self.editor_open = false,
-            BodyMsg::OpenEditor => self.editor_open = true,
+            ContainerMsg::CloseEditor => self.editor_open = false,
+            ContainerMsg::OpenEditor => self.editor_open = true,
 
-            BodyMsg::CloseRender => self.render_open = false,
+            ContainerMsg::CloseRender => self.render_open = false,
 
-            BodyMsg::OpenRender => {
+            ContainerMsg::OpenRender => {
                 self.render_open = true;
-                ctx.link().send_message(BodyMsg::UpdateRender);
+                ctx.link().send_message(ContainerMsg::UpdateRender);
             }
-            BodyMsg::UpdateRender => {
+            ContainerMsg::UpdateRender => {
                 self.content = EDITOR_ID
                     .get_element_cast::<web_sys::HtmlTextAreaElement>()
                     .value();
