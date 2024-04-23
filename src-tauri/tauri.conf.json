@@ -15,7 +15,9 @@
         "title": "htmail",
         "width": 720,
         "height": 1080,
-        "alwaysOnTop": true,
+        "x": 0,
+        "y": 0,
+        "alwaysOnTop": false,
         "resizable": true
       }
     ],

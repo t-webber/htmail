@@ -76,9 +76,9 @@ impl yew::Component for ContainerTextArea {
                     <actions::ActionList actions={vec![
                         actions::ActionBtn{
                             condition: self.other_open,
-                        content: yew::html!( <yew_icons::Icon icon_id={yew_icons::IconId::LucideX} class="action-icon" />),
-                        action: yew::Callback::from(move |()| callback_one.emit(ContainerMsg::CloseEditor))
-                    },
+                            content: yew::html!( <yew_icons::Icon icon_id={yew_icons::IconId::LucideX} class="action-icon" />),
+                            action: yew::Callback::from(move |()| callback_one.emit(ContainerMsg::CloseEditor))
+                        },
                     actions::ActionBtn{
                         condition: !self.other_open,
                         content: yew::html!( <yew_icons::Icon icon_id={yew_icons::IconId::LucideView} class="action-icon" />),
